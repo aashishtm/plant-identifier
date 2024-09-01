@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = "Identify this plant and provide its name, a brief description, and basic care instructions.";
+    const prompt = "Identify this plant and provide its name, a brief description, and basic care instructions. Format your response as follows: 'Name: [plant name]\n\nDescription: [brief description]\n\nCare Instructions: [basic care instructions]'";
 
     const result = await model.generateContent([
       prompt,
@@ -30,7 +30,13 @@ export async function POST(request: NextRequest) {
     const text = response.text();
 
     // Parse the text response
-    const [name, description, careInstructions] = text.split('\n\n');
+    const nameMatch = text.match(/Name: (.+)/);
+    const descriptionMatch = text.match(/Description: (.+)/s);
+    const careInstructionsMatch = text.match(/Care Instructions: (.+)/s);
+
+    const name = nameMatch ? nameMatch[1].trim() : "Unknown Plant";
+    const description = descriptionMatch ? descriptionMatch[1].trim() : "No description available.";
+    const careInstructions = careInstructionsMatch ? careInstructionsMatch[1].trim() : "No care instructions available.";
 
     return NextResponse.json({ name, description, careInstructions });
   } catch (error) {

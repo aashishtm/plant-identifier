@@ -50,7 +50,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
   const startCamera = useCallback(async () => {
     setShowCamera(true);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const constraints = {
+        video: {
+          facingMode: { ideal: 'environment' }
+        }
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
@@ -109,7 +114,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload }) => {
         </>
       ) : (
         <div className="relative">
-          <video ref={videoRef} autoPlay className="w-full h-64 object-cover" />
+          <video ref={videoRef} autoPlay playsInline className="w-full h-64 object-cover" />
           <button
             onClick={captureImage}
             className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"

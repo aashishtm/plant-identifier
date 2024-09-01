@@ -4,8 +4,14 @@ import React, { useState } from 'react';
 import ImageUpload from './components/ImageUpload';
 import PlantInfo from './components/PlantInfo';
 
+interface PlantData {
+  name: string;
+  description: string;
+  careInstructions: string;
+}
+
 export default function Home() {
-  const [plantInfo, setPlantInfo] = useState<{ name: string; description: string; careInstructions: string } | null>(null);
+  const [plantInfo, setPlantInfo] = useState<PlantData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -29,7 +35,7 @@ export default function Home() {
         throw new Error('Failed to identify plant');
       }
 
-      const data = await response.json();
+      const data: PlantData = await response.json();
       setPlantInfo(data);
     } catch (err) {
       setError('An error occurred while identifying the plant. Please try again.');
@@ -45,7 +51,14 @@ export default function Home() {
       <ImageUpload onImageUpload={handleImageUpload} />
       {loading && <p className="text-center mt-4">Identifying plant...</p>}
       {error && <p className="text-center mt-4 text-red-500">{error}</p>}
-      {plantInfo && imagePreview && <PlantInfo {...plantInfo} imageUrl={imagePreview} />}
+      {plantInfo && imagePreview && (
+        <PlantInfo
+          name={plantInfo.name}
+          description={plantInfo.description}
+          careInstructions={plantInfo.careInstructions}
+          imageUrl={imagePreview}
+        />
+      )}
     </div>
   );
 }
