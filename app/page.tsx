@@ -8,10 +8,13 @@ export default function Home() {
   const [plantInfo, setPlantInfo] = useState<{ name: string; description: string; careInstructions: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const handleImageUpload = async (file: File) => {
+  const handleImageUpload = async (file: File, previewUrl: string) => {
     setLoading(true);
     setError(null);
+    setImagePreview(previewUrl);
+    setPlantInfo(null); // Reset plant info when a new image is uploaded
 
     const formData = new FormData();
     formData.append('image', file);
@@ -42,7 +45,7 @@ export default function Home() {
       <ImageUpload onImageUpload={handleImageUpload} />
       {loading && <p className="text-center mt-4">Identifying plant...</p>}
       {error && <p className="text-center mt-4 text-red-500">{error}</p>}
-      {plantInfo && <PlantInfo {...plantInfo} />}
+      {plantInfo && imagePreview && <PlantInfo {...plantInfo} imageUrl={imagePreview} />}
     </div>
   );
 }
