@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, Part } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!);
@@ -16,16 +16,15 @@ export async function POST(request: NextRequest) {
 
     const prompt = "Identify this plant and provide its name, a brief description, and basic care instructions. Format your response as follows: 'Name: [plant name]\n\nDescription: [brief description]\n\nCare Instructions: [basic care instructions]'";
 
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          mimeType: image.type,
-          data: Buffer.from(await image.arrayBuffer()).toString('base64')
-        }
+    const imageData = await image.arrayBuffer();
+    const imagePart: Part = {
+      inlineData: {
+        data: Buffer.from(imageData).toString('base64'),
+        mimeType: image.type
       }
-    ]);
+    };
 
+    const result = await model.generateContent([prompt, imagePart]);
     const response = await result.response;
     const text = response.text();
 
